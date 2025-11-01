@@ -1,0 +1,7 @@
+.secrets/*
+!.secrets/.gitkeep
+
+cache/.bash_history
+cache/.zsh_history
+cache/*
+!cache/.gitkeep
