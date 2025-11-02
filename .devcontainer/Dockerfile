@@ -22,19 +22,39 @@ RUN \
     && su ${USERNAME} -c "umask 0002 && npm install -g eslint" \
     && npm cache clean --force > /dev/null 2>&1
 
+# Add ZSH and install Oh My Zsh
+RUN \
+    apt-get update && apt-get install -y zsh \
+    && chsh -s /usr/bin/zsh ${USERNAME}
+
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Add Powerlevel10k theme and copy dotfiles
+RUN zsh -c 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k'
+
+COPY dotfiles/.zshrc /scripts/.zshrc
+COPY dotfiles/.p10k.zsh /scripts/.p10k.zsh
+COPY scripts/copy-config-dotfiles.sh /scripts/copy-config-dotfiles.sh
+RUN \
+    chmod +x /scripts/copy-config-dotfiles.sh \
+    && /scripts/copy-config-dotfiles.sh
+
+# Fix for gitstatus to be downloaded into image, because it is used in Powerlevel10k
+RUN zsh -c "source ~/.zshrc"
+
 # Add Hasura CLI
 RUN \
     curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VERSION=v2.48.6 bash
 
-COPY scripts/install-google-cloud-proxy.sh ./scripts/install-google-cloud-proxy.sh
-COPY scripts/install-google-cloud-sdk.sh ./scripts/install-google-cloud-sdk.sh
+COPY scripts/install-google-cloud-proxy.sh /scripts/install-google-cloud-proxy.sh
+COPY scripts/install-google-cloud-sdk.sh /scripts/install-google-cloud-sdk.sh
 
 # Install Cloud SQL Proxy
 RUN \
-    chmod +x ./scripts/install-google-cloud-proxy.sh \
-    && ./scripts/install-google-cloud-proxy.sh
+    chmod +x /scripts/install-google-cloud-proxy.sh \
+    && /scripts/install-google-cloud-proxy.sh
 
 # Install Google Cloud SDK
 RUN \
-    chmod +x ./scripts/install-google-cloud-sdk.sh \
-    && ./scripts/install-google-cloud-sdk.sh
+    chmod +x /scripts/install-google-cloud-sdk.sh \
+    && /scripts/install-google-cloud-sdk.sh

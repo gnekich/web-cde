@@ -5,20 +5,19 @@
     "dockerfile": "Dockerfile"
   },
   "postCreateCommand": {
-    "Install Powerlevel10k for ZSH": ".devcontainer/scripts/post-create-install-zsh-powerleverl10k.sh",
     "Copy SSH config from .secrets to devcontainer (If exists)": ".devcontainer/scripts/copy-ssh-config-to-container.sh",
     "Fix pnpm version": "npm install -g pnpm@latest && pnpm config set store-dir /home/node/.local/share/pnpm",
-    "Persistent bash history - Fix Volume Permissions": "sudo mkdir -p /cache && sudo chown -R $(whoami): /cache",
+    "Persistent bash history - Fix Volume Permissions": "su -c 'mkdir -p /cache && chown -R $(whoami): /cache'",
     "Add history to .bashrc": "echo $BASH_HISTORY_SNIPPET >> ~/.bashrc"
     // "Frontend Development - Run vitejs dev": "cd react-frontend && pnpm install && pnpm run dev",
   },
   "features": {
-    "ghcr.io/devcontainers/features/common-utils": {
-      "installZsh": true,
-      "installOhMyZsh": true,
-      "installOhMyZshConfig": true,
-      "configureZshAsDefaultShell": true
-    },
+    // "ghcr.io/devcontainers/features/common-utils": {
+    //   "installZsh": true,
+    //   "installOhMyZsh": true,
+    //   "installOhMyZshConfig": true,
+    //   "configureZshAsDefaultShell": true
+    // },
     "ghcr.io/devcontainers-extra/features/zsh-plugins:0": {
       "plugins": "zsh-autosuggestions zsh-syntax-highlighting",
       "omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions.git https://github.com/zsh-users/zsh-syntax-highlighting.git"
