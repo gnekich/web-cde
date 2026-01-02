@@ -54,7 +54,7 @@
         "humao.rest-client",
         "ms-azuretools.vscode-docker",
         "streetsidesoftware.code-spell-checker",
-        "gxl.git-graph-3"
+        "mhutchie.git-graph"
       ]
     }
   },
