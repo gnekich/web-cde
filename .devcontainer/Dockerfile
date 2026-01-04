@@ -58,3 +58,10 @@ RUN \
 RUN \
     chmod +x /scripts/install-google-cloud-sdk.sh \
     && /scripts/install-google-cloud-sdk.sh
+
+COPY scripts/install-rust-and-solana-sdk.sh /scripts/install-rust-and-solana-sdk.sh
+
+# Install rust and solana-cli
+RUN \
+    chmod +x /scripts/install-rust-and-solana-sdk.sh \
+    && /scripts/install-rust-and-solana-sdk.sh
