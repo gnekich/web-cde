@@ -19,6 +19,20 @@ The vscode should be set such that you can do the commit signing out of the box,
 
 ## Setup
 
+to use this boilerplate for new project you can use following commands:
+
+```bash
+mkdir newProject
+cd newProject
+git clone https://github.com/gnekich/web-cde
+mv web-cde/{.,}* .
+rm -rf web-cde
+# rm -rf .git # (optional)
+```
+
+or you can install [degit](https://github.com/Rich-Harris/degit)
+
+
 ### Git config
 
 ```bash
