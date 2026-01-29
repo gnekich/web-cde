@@ -1,3 +1,4 @@
 {
+  "terminal.integrated.fontFamily": "MesloLGS NF",
   "git.enableCommitSigning": true // Enables git commit signing
 }
