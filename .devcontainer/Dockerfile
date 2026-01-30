@@ -58,3 +58,26 @@ RUN \
 RUN \
     chmod +x /scripts/install-google-cloud-sdk.sh \
     && /scripts/install-google-cloud-sdk.sh
+
+# Add age
+RUN \
+    apt-get install -y age
+
+# Add sops
+RUN \
+    curl -LO https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.linux.amd64 \
+    && mv sops-v3.11.0.linux.amd64 /usr/local/bin/sops \
+    && chmod +x /usr/local/bin/sops
+
+# Add vim & nano
+RUN \
+    apt-get install -y vim nano
+
+# # Add ngrok
+# RUN \
+#     curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+#     | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+#     && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" \
+#     | tee /etc/apt/sources.list.d/ngrok.list \
+#     && apt update \
+#     && apt install ngrok
