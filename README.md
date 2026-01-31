@@ -40,6 +40,7 @@ git config user.name "John Doe"
 git config user.email "redacted@redacted"
 git config gpg.format ssh
 git config user.signingkey ./.devcontainer/.secrets/KEYS/your-user-signing-priv-keys
+git branch -m main
 ```
 
 ### Keys & Credentials
