@@ -20,7 +20,7 @@ echo -e "\n\nexport PATH=\"\$HOME/.cargo/bin:\$PATH\"" >> ~/.zshrc
 
 # Fix for linux arm64 by downloading prebuilt binaries
 ARCH=$(uname -m)
-VERSION="3.1.5"
+VERSION="3.1.11"
 
 case "$ARCH" in
     x86_64)

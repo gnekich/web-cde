@@ -79,6 +79,16 @@ RUN \
 RUN \
     apt-get install -y vim nano
 
+# Add Terraform CLI
+RUN \
+    apt-get install -y wget lsb-release \
+    && cd /tmp \
+    && wget -O hashicorp.gpg https://apt.releases.hashicorp.com/gpg \
+    && gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg ./hashicorp.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y terraform
+
 # # Add ngrok
 # RUN \
 #     curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
@@ -87,3 +97,36 @@ RUN \
 #     | tee /etc/apt/sources.list.d/ngrok.list \
 #     && apt update \
 #     && apt install ngrok
+
+# Install pnpm
+RUN \
+    npm install -g pnpm@latest && pnpm config set store-dir /home/node/.local/share/pnpm
+
+# Setup pnpm Home and install global packages
+ENV PNPM_HOME=/usr/local/share/pnpm-global
+ENV PATH=${PNPM_HOME}:${PATH}
+ENV SHELL=/bin/bash
+
+RUN \
+    mkdir -p ${PNPM_HOME} \
+    && pnpm setup
+
+# # Install required packages for various dependencies (Expo/React Native)
+# RUN \
+#     apt-get install -y \
+#     libnspr4 \
+#     libnss3 \
+#     libdbus-1-3 \
+#     libatk1.0-0 \
+#     libatk-bridge2.0-0 \
+#     libasound2 \
+#     libgtk-3-0 \
+#     libgtk-3-dev
+
+# # Install Expo CLI
+# RUN \
+#     pnpm add -g expo-cli
+
+# Install cloudflare wrangler
+RUN \
+    pnpm add -g wrangler
