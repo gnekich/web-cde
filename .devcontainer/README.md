@@ -1,59 +1,10 @@
-# WEB CDE
+# Devcontainers
 
-This repository is intended for developers that are looking for a containerised development environment setup for developing web applications.
+Here we document decisions and explain the logic behind some of the opinionated dev setup.
 
-Focus of this repository is Node.js setup. With specific set of tools...
+## Security
 
-- Google Cloud SDK
-- Google Cloud SQL Proxy
-- Hasura CLI
-- Node.js v24
-
-## VsCode Devcontainers
-
-We are using vscode devcontainers to do the setup.
-
-The vscode should be set such that you can do the commit signing out of the box, thus we also provide .vscode configuration.
-
-## Scripts
-
-## Setup
-
-to use this boilerplate for new project you can use following commands:
-
-```bash
-mkdir newProject
-cd newProject
-git clone https://github.com/gnekich/web-cde
-mv web-cde/{.,}* .
-rm -rf web-cde
-# rm -rf .git # (optional)
-```
-
-or you can install [degit](https://github.com/Rich-Harris/degit)
-
-
-### Git config
-
-```bash
-git config user.name "John Doe"
-git config user.email "redacted@redacted"
-git config gpg.format ssh
-git config user.signingkey ./.devcontainer/.secrets/KEYS/your-user-signing-priv-keys
-git branch -m main
-```
-
-### Keys & Credentials
-
-If you want to have access to the repository from the devcontainer you sometimes need to do additional tweaks based on how you have access to the repository from the host.
-
-This setup is highly opinionated and thus some scripts will look for SSH keys in specific .devcontainer/.secrets/KEYS/_ directory and will also pass the configuration to the ssh if in .devcontainer/.secrets/SSH/_ folder.
-
-### SOPS
-
-We should use SOPS with age whenever possible...
-
-First let's generate few keys... one for developer (we recommend using a password) and one key for deployments (local-deployment, without password, because it is easier setup in CI/CD and not necessary more secure and should only be used for deployment)
+### Preferred option
 
 ```bash
 # Generate ED25519 key for the developer it can be used for SSH, signing commits, encrypting/sharing local or env specific .env, sending sensitive files or diagrams, etc. 
@@ -86,16 +37,34 @@ SOPS_AGE_SSH_PRIVATE_KEY_FILE="./.devcontainer/.secrets/KEYS/developer-key" sops
 SOPS_AGE_SSH_PRIVATE_KEY_FILE="./.devcontainer/.secrets/KEYS/local-env-key" sops decrypt .enc.env
 ```
 
-### Age
+### Other commands that you can use
 
-Because we have age as our main encrypt/decrypt tool we can do this for files.
+This a list of snippets...
 
 ```bash
-# Encrypt
-age \
-    -R './.devcontainer/.secrets/KEYS/developer-key.pub' \
-    -r "$(curl https://github.com/benjojo.keys)" sensitive.file > payload.age
+# Generate key, encrypt it with password... (you can leave empty for random password)
+age-keygen | age -p > ./.devcontainer/.secrets/KEYS/sops_age_key_dev_env.txt.age
 
-# Decrypt
-age -d -i './.devcontainer/.secrets/KEYS/developer-key' payload.age > result
+# First time you try to use sops decrypt it can fail because we need to create encrypted sops file
+sops encrypt --age <age_pub_key> .env > .env
+
+# Once the encrypted file is created we need
+sops encrypt --age 'ssh-ed25519 <ssh_pub_key> developer@company.domain' .env.example > .env
+```
+
+```bash
+# Generate age key and encrypt it with age password (Save )
+age-keygen | age -p > ./.devcontainer/.secrets/KEYS/sops_age_key_dev_env.txt.age
+
+# Decrypt age password file
+SOPS_AGE_KEY_FILE="./.devcontainer/.secrets/KEYS/sops_age_key.txt" EDITOR="code --wait" sops .env
+```
+
+```bash
+age-keygen -o sops_age_key.txt
+sops encrypt --age <pub_key> .env > .enc.env
+SOPS_AGE_KEY_FILE="./sops_age_key.txt" sops decrypt .enc.env > .env
+
+# How to open vscode 
+SOPS_AGE_KEY_FILE="./sops_age_key.txt" EDITOR="code --wait" sops .env
 ```
