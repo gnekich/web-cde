@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install prerequisites
-sudo apt-get install -y \
+apt-get install -y \
     build-essential \
     pkg-config \
     libudev-dev llvm libclang-dev \
@@ -40,11 +40,15 @@ if [ -z "$BINARY" ]; then
     exit 1
 fi
 
-# Download build for arm64
-wget https://github.com/gnekich/agave-dist/releases/download/v$VERSION/$BINARY
+cd / 
 
-# Extract to /usr/local
-tar xjf $BINARY
+# Download build for arm64
+wget "https://github.com/gnekich/agave-dist/releases/download/v$VERSION/$BINARY"
+
+mkdir -p /solana-release
+
+# Extract to /solana-release
+tar xjf $BINARY -C /
 
 #echo -e "\n\nexport PATH=\"$HOME/.local/share/solana/install/active_release/bin:$PATH\"" >> ~/.zshrc
 

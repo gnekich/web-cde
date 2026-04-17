@@ -1,30 +1,43 @@
-ARG VARIANT=24-bookworm
-FROM node:${VARIANT}
+ARG VARIANT=25-bookworm
+FROM ubuntu:24.04
 
 ARG USERNAME=node
 ARG NPM_GLOBAL=/usr/local/share/npm-global
 
+# Install Node.js
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_25.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create the npm user if it doesn't exist
+RUN useradd -m -s /bin/bash ${USERNAME} || true
+
 # Add NPM global to PATH.
 ENV PATH=${NPM_GLOBAL}/bin:${PATH}
 
-RUN \
-    # Configure global npm install location, use group to adapt to UID/GID changes
-    if ! cat /etc/group | grep -e "^npm:" > /dev/null 2>&1; then groupadd -r npm; fi \
-    && usermod -a -G npm ${USERNAME} \
-    && umask 0002 \
-    && mkdir -p ${NPM_GLOBAL} \
-    && touch /usr/local/etc/npmrc \
-    && chown ${USERNAME}:npm ${NPM_GLOBAL} /usr/local/etc/npmrc \
-    && chmod g+s ${NPM_GLOBAL} \
-    && npm config -g set prefix ${NPM_GLOBAL} \
-    && su ${USERNAME} -c "npm config -g set prefix ${NPM_GLOBAL}" \
-    # Install eslint
-    && su ${USERNAME} -c "umask 0002 && npm install -g eslint" \
-    && npm cache clean --force > /dev/null 2>&1
+# RUN \
+#     # Configure global npm install location, use group to adapt to UID/GID changes
+#     if ! cat /etc/group | grep -e "^npm:" > /dev/null 2>&1; then groupadd -r npm; fi \
+#     && usermod -a -G npm ${USERNAME} \
+#     && umask 0002 \
+#     && mkdir -p ${NPM_GLOBAL} \
+#     && touch /usr/local/etc/npmrc \
+#     && chown ${USERNAME}:npm ${NPM_GLOBAL} /usr/local/etc/npmrc \
+#     && chmod g+s ${NPM_GLOBAL} \
+#     && npm config -g set prefix ${NPM_GLOBAL} \
+#     && su ${USERNAME} -c "npm config -g set prefix ${NPM_GLOBAL}" \
+#     # Install eslint
+#     && su ${USERNAME} -c "umask 0002 && npm install -g eslint" \
+#     && npm cache clean --force > /dev/null 2>&1
 
 # Add ZSH and install Oh My Zsh
 RUN \
-    apt-get update && apt-get install -y zsh \
+    apt-get update && apt-get install -y zsh git \
     && chsh -s /usr/bin/zsh ${USERNAME}
 
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -130,3 +143,12 @@ RUN \
 # Install cloudflare wrangler
 RUN \
     pnpm add -g wrangler
+
+RUN apt-get install -y \
+    build-essential \
+    pkg-config \
+    libudev-dev llvm libclang-dev \
+    protobuf-compiler libssl-dev
+
+# RUN "cargo install --git https://github.com/solana-foundation/anchor avm --force" && \
+#     "cargo install --git https://github.com/solana-foundation/anchor --tag v1.0.0-rc.5 anchor-cli --force"
